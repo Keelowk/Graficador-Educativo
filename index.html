@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Graficador Educativo</title>
   <link rel="manifest" href="manifest.json">
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -28,7 +30,7 @@
 </head>
 <body>
   <h2>Graficador Educativo</h2>
-  <input id="funcInput" type="text" value="sin(x)" />
+  <input id="funcInput" type="text" value="x^2" />
   <button onclick="graficar()">Graficar</button>
   <div id="graph"></div>
   <script>
@@ -36,23 +38,33 @@
       const expr = document.getElementById("funcInput").value;
       const x = [];
       const y = [];
+      let f;
+      try {
+        f = math.compile(expr);
+      } catch (err) {
+        alert("Expresión inválida: " + err);
+        return;
+      }
+
       for (let i = -10; i <= 10; i += 0.1) {
         x.push(i);
         try {
-          y.push(eval(expr.replace(/x/g, `(${i})`)));
+          y.push(f.evaluate({ x: i }));
         } catch {
           y.push(null);
         }
       }
+
       const data = [{
         x: x,
         y: y,
         type: 'scatter',
         mode: 'lines',
-        line: {color: 'black'}
+        line: { color: 'black' }
       }];
       Plotly.newPlot('graph', data, { margin: { t: 0 } });
     }
+
     window.onload = graficar;
   </script>
 </body>
