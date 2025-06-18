@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Graficador Educativo</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: white;
+      color: black;
+    }
+    input, button {
+      font-size: 16px;
+      padding: 8px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    #graph {
+      width: 100%;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Graficador Educativo</h2>
+  <input id="funcInput" type="text" value="sin(x)" />
+  <button onclick="graficar()">Graficar</button>
+  <div id="graph"></div>
+  <script>
+    function graficar() {
+      const expr = document.getElementById("funcInput").value;
+      const x = [];
+      const y = [];
+      for (let i = -10; i <= 10; i += 0.1) {
+        x.push(i);
+        try {
+          y.push(eval(expr.replace(/x/g, `(${i})`)));
+        } catch {
+          y.push(null);
+        }
+      }
+      const data = [{
+        x: x,
+        y: y,
+        type: 'scatter',
+        mode: 'lines',
+        line: {color: 'black'}
+      }];
+      Plotly.newPlot('graph', data, { margin: { t: 0 } });
+    }
+    window.onload = graficar;
+  </script>
+</body>
+</html>
