@@ -32,7 +32,7 @@
   </style>
 </head>
 <body>
- <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+ <div style="display: flex; align-items: center;justify-content: center;text-align: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
   <div style="display: flex; gap: 10px;">
     <img src="OIP.jpg" alt="Logo UNU" style="max-width: 100px; height: auto;" />
     <img src="sis.jpg" alt="Logo Sistemas" style="max-width: 100px; height: auto;" />
@@ -47,6 +47,7 @@
 </p>
   </div>
 </div>
+<div style="max-width: 400px; margin: 0 auto;">
   <select onchange="cambiarFuncion(this)" style="width: 200px;">
     <option value="">Elige una función</option>
     <option value="x^2">x² (funcion cuadratica)</option>
@@ -65,9 +66,12 @@
     <option value="1 / sec(x)">cosec(x) (funcion cosecante)</option>
     <option value="(x^2 + 1) / (x - 2)">(x²+1) / (x-2) (funcion racional)</option>
   </select>
-
-  <input id="funcInput" type="text" value="x^2" />
+  </div>
+    <input id="funcInput" type="text" value="x^2" style="width: 100%;" />
+    <div style="max-width: 400px; margin: 0 auto; display: flex; justify-content: center; gap: 10px;">
+  <input type="color" id="colorPicker" value="#0000ff" title="Color de la línea" onchange="graficar()" />
   <button onclick="graficar()">Graficar</button>
+</div>
   <div id="graph">
 </div>
   <script>
@@ -79,8 +83,9 @@
       }
     }
 
-    function graficar() {
+     function graficar() {
       const expr = document.getElementById("funcInput").value;
+      const color = document.getElementById("colorPicker").value;
       const x = [];
       const y = [];
       let f;
@@ -90,6 +95,7 @@
         alert("Expresión inválida: " + err);
         return;
       }
+
 
       for (let i = -10; i <= 10; i += 0.1) {
         x.push(i);
@@ -105,7 +111,7 @@
         y: y,
         type: 'scatter',
         mode: 'lines',
-        line: { color: 'blue', width: 4 }
+        line: { color: color, width: 4 }
       }];
 
       const layout = {
