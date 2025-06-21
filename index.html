@@ -13,14 +13,17 @@
       font-family: sans-serif;
       padding: 20px;
       margin: 0;
-      background: white;
-      color: black;
+      background: rgb(22, 22, 22);
+      color: limegreen;
     }
-    input, button {
+    select, input, button {
       font-size: 16px;
       padding: 8px;
       margin-bottom: 10px;
       width: 100%;
+      background: #202020;
+      color: limegreen;
+      border: 1px solid limegreen;
     }
     #graph {
       width: 100%;
@@ -29,11 +32,53 @@
   </style>
 </head>
 <body>
-  <h2>Graficador Educativo</h2>
+ <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+  <div style="display: flex; gap: 10px;">
+    <img src="OIP.jpg" alt="Logo UNU" style="max-width: 100px; height: auto;" />
+    <img src="sis.jpg" alt="Logo Sistemas" style="max-width: 100px; height: auto;" />
+  </div>
+   <div>
+    <h2 style="color: limegreen; margin: 0;">
+      GRAFICADOR DE FUNCIONES<br>
+      <span style="color: red;">MATEMÁTICA I B</span>
+    </h2>
+     <p style="text-align: center; margin-top: 40px; color: rgb(4, 88, 4);">
+  Desarrollado por Alumno: Kelvin Rodrigo Diaz Cruz
+</p>
+  </div>
+</div>
+  <select onchange="cambiarFuncion(this)" style="width: 200px;">
+    <option value="">Elige una función</option>
+    <option value="x^2">x² (funcion cuadratica)</option>
+    <option value="sqrt(x)">√x (raiz cuadrada)</option>
+    <option value="nthRoot(x, 3)">∛x (raiz cubica)</option>
+    <option value="abs(x)">|x| (valor absoluto)</option>
+    <option value="sign(x)">sign(x) (funcion signo)</option>
+    <option value="floor(x)">⌊x⌋ (maximo entero)</option>
+    <option value="ceil(x)">⌈x⌉ (entero arriba)</option>
+    <option value="round(x)">[x] (redondear)</option>
+    <option value="sin(x)">sen(x) (funcion seno)</option>
+    <option value="cos(x)">cos(x) (funcion coseno)</option>
+    <option value="tan(x)">tan(x) (funcion tangente)</option>
+    <option value="sec(x)">sec(x) (funcion secante)</option>
+    <option value="1 / tan(x)">cotan(x) (funcion cotangente)</option>
+    <option value="1 / sec(x)">cosec(x) (funcion cosecante)</option>
+    <option value="(x^2 + 1) / (x - 2)">(x²+1) / (x-2) (funcion racional)</option>
+  </select>
+
   <input id="funcInput" type="text" value="x^2" />
   <button onclick="graficar()">Graficar</button>
-  <div id="graph"></div>
+  <div id="graph">
+</div>
   <script>
+    function cambiarFuncion(menu) {
+      const expresion = menu.value;
+      if (expresion) {
+        document.getElementById("funcInput").value = expresion;
+        graficar();
+      }
+    }
+
     function graficar() {
       const expr = document.getElementById("funcInput").value;
       const x = [];
@@ -60,9 +105,16 @@
         y: y,
         type: 'scatter',
         mode: 'lines',
-        line: { color: 'black' }
+        line: { color: 'blue', width: 4 }
       }];
-      Plotly.newPlot('graph', data, { margin: { t: 0 } });
+
+      const layout = {
+        paper_bgcolor: "rgb(20, 20, 20)",
+        plot_bgcolor: "rgb(20, 20, 20)",
+        font: { color: "limegreen" }
+      };
+
+      Plotly.newPlot('graph', data, layout);
     }
 
     window.onload = graficar;
