@@ -74,7 +74,11 @@
 </div>
   <div id="graph">
 </div>
+<div id="info" style="margin-top: 20px; color: limegreen; text-align: center;"></div>
   <script>
+    document.getElementById("funcInput").addEventListener("input", function () {
+  this.value = this.value.toLowerCase();
+});
     function cambiarFuncion(menu) {
       const expresion = menu.value;
       if (expresion) {
@@ -82,46 +86,111 @@
         graficar();
       }
     }
-
+function obtenerDominioYRangoReal(expr) {
+  switch (expr) {
+    case "x^2":
+      return { dominio: "ℝ", rango: "[0, ∞)" };
+    case "sqrt(x)":
+      return { dominio: "[0, ∞)", rango: "[0, ∞)" };
+    case "nthRoot(x, 3)":
+      return { dominio: "ℝ", rango: "ℝ" };
+    case "abs(x)":
+      return { dominio: "ℝ", rango: "[0, ∞)" };
+    case "sign(x)":
+      return { dominio: "ℝ", rango: "{-1, 0, 1}" };
+    case "floor(x)":
+    case "ceil(x)":
+    case "round(x)":
+      return { dominio: "ℝ", rango: "ℤ" };
+    case "sin(x)":
+    case "cos(x)":
+      return { dominio: "ℝ", rango: "[-1, 1]" };
+    case "tan(x)":
+      return { dominio: "ℝ \\ {π/2 + kπ}", rango: "ℝ" };
+    case "1 / tan(x)":
+      return { dominio: "ℝ \\ {kπ}", rango: "ℝ" };
+    case "sec(x)":
+      return { dominio: "ℝ \\ {π/2 + kπ}", rango: "(-∞, -1] ∪ [1, ∞)" };
+    case "1 / sec(x)":
+      return { dominio: "ℝ \\ {π/2 + kπ}", rango: "[-1, 1] \\ {0}" };
+    case "(x^2 + 1) / (x - 2)":
+      return { dominio: "ℝ \\ {2}", rango: "ℝ" };
+    default:
+      return { dominio: "Aproximado", rango: "Aproximado" };
+  }
+}
      function graficar() {
-      const expr = document.getElementById("funcInput").value;
-      const color = document.getElementById("colorPicker").value;
-      const x = [];
-      const y = [];
-      let f;
-      try {
-        f = math.compile(expr);
-      } catch (err) {
-        alert("Expresión inválida: " + err);
-        return;
-      }
+  const expr = document.getElementById("funcInput").value;
+  const reales = obtenerDominioYRangoReal(expr);
+  const color = document.getElementById("colorPicker").value;
+  const x = [];
+  const y = [];
+  const validX = [];
+  const validY = [];
+  let f;
 
+  try {
+    f = math.compile(expr);
+  } catch (err) {
+    alert("Expresión inválida: " + err);
+    return;
+  }
 
-      for (let i = -10; i <= 10; i += 0.1) {
-        x.push(i);
-        try {
-          y.push(f.evaluate({ x: i }));
-        } catch {
-          y.push(null);
-        }
-      }
+  for (let i = -10; i <= 10; i += 0.1) {
+  try {
+    const result = f.evaluate({ x: i });
 
-      const data = [{
-        x: x,
-        y: y,
-        type: 'scatter',
-        mode: 'lines',
-        line: { color: color, width: 4 }
-      }];
-
-      const layout = {
-        paper_bgcolor: "rgb(20, 20, 20)",
-        plot_bgcolor: "rgb(20, 20, 20)",
-        font: { color: "limegreen" }
-      };
-
-      Plotly.newPlot('graph', data, layout);
+    if (!isFinite(result) || Math.abs(result) > 1e3) {
+      // Si el valor es muy grande o no es finito, insertamos null
+      x.push(i);
+      y.push(null);
+    } else {
+      x.push(i);
+      y.push(result);
+      validX.push(i);
+      validY.push(result);
     }
+  } catch {
+    x.push(i);
+    y.push(null);
+  }
+}
+
+  const data = [{
+    x: x,
+    y: y,
+    type: 'scatter',
+    mode: 'lines',
+    line: { color: color, width: 4 }
+  }];
+
+  const layout = {
+    paper_bgcolor: "rgb(20, 20, 20)",
+    plot_bgcolor: "rgb(20, 20, 20)",
+    font: { color: "limegreen" }
+  };
+
+  Plotly.newPlot('graph', data, layout);
+
+  // Mostrar dominio y rango si hay datos válidos
+  if (validX.length > 0 && validY.length > 0) {
+    const minX = Math.min(...validX);
+    const maxX = Math.max(...validX);
+    const minY = Math.min(...validY);
+    const maxY = Math.max(...validY);
+    document.getElementById("info").innerHTML = `
+  <strong>Dominio real:</strong> ${reales.dominio}<br>
+  <strong>Rango real:</strong> ${reales.rango}<br><br>
+  <strong>Dominio gráfico:</strong> [${minX.toFixed(2)}, ${maxX.toFixed(2)}]<br>
+  <strong>Rango gráfico:</strong> [${minY.toFixed(2)}, ${maxY.toFixed(2)}]
+`;
+  } else {
+    document.getElementById("info").innerHTML = `
+      <strong>Dominio:</strong> No definido<br>
+      <strong>Rango:</strong> No definido
+    `;
+  }
+}
 
     window.onload = graficar;
   </script>
